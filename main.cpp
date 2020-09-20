@@ -1,11 +1,10 @@
-#include "board.h"
 #include <QApplication>
+#include "SingleGame.h"
 
-int main(int argc, char *argv[])
+int main (int argc,char * argv[])
 {
-    QApplication a(argc, argv);
-    Board w;
-    w.show();
-
-    return a.exec();
+    QApplication app (argc,argv);
+    SingleGame board;
+    board.show();
+    return app.exec();
 }

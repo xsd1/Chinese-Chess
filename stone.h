@@ -2,27 +2,28 @@
 #define STONE_H
 
 #include <QString>
+
 class Stone
 {
 public:
     Stone();
-    ~Stone();
+    ~Stone ();
 
-    //定义枚举
     enum TYPE{JIANG,CHE,PAO,MA,BING,SHI,XIANG};
-    int _row;
-    int _col;
-    int _id;
+
+    int _row;//行
+    int _col;//列
+    int _id; //编号
     bool _dead;
     bool _red;
     TYPE _type;
-    void init(int id)
+
+    void init (int id)
     {
-        struct
-        {
+        struct {
             int row,col;
             Stone::TYPE type;
-        }pos[16] = {
+        }pos[16]={
         {0,0,Stone::CHE},
         {0,1,Stone::MA},
         {0,2,Stone::XIANG},
@@ -41,11 +42,11 @@ public:
         {3,6,Stone::BING},
         {3,8,Stone::BING},
         };
-        _id = id;
-        _dead = false;
-        _red = id<16;
+        _id=id;
+        _dead=false;
+        _red=id>=16;
 
-        if(id < 16)
+        if (id<16)
         {
             _row = pos[id].row;
             _col = pos[id].col;
@@ -53,12 +54,14 @@ public:
         }
         else
         {
-            _row = 9 - pos[id-16].row;
-            _col = 8 - pos[id-16].col;
+            _row = 9-pos[id-16].row;
+            _col = 8-pos[id-16].col;
             _type = pos[id-16].type;
-        }//对称
+        }
+
     }
-    QString getText()
+
+    QString getText ()
     {
         switch (this->_type)
         {
