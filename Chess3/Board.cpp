@@ -2,26 +2,61 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QMessageBox>
+#include <QLabel>
+#include <QFont>
 
 Board::Board(QWidget *parent) : QWidget(parent)
 {
-    //初始化棋子
-     for(int i=0;i<32;i++)
-     {
-         _s[i].init(i);
-     }
+    init(true);
+    this->resize(500,500);
+    _button.setParent(this);
+    _button.move(400,200);
+    _button.resize(80,25);
+    _button.setText("悔棋");
+    QFont font1("楷体",12,75);
+    _button.setFont(font1);
+    QLabel *le = new QLabel (this);
+    le->setText("楚河            汉界");
+    QFont font("华文行楷",20,75);
+    le->setAlignment(Qt::AlignCenter);
+    le->setFont(font);
+    le->resize(320,40);
+    le->move(40,200);
+    connect(&_button,&QPushButton::released,this,&Board::slotBack);
 
-     _selectid = -1;
-     _bRedTurn = true;
+}
+//初始化棋子
+void Board::init(bool bRedSide)
+{
+    for(int i=0;i<32;i++)
+    {
+        _s[i].init(i);
+    }
+   if(bRedSide)
+    {
+        for(int i=0; i<32; ++i)
+        {
+            _s[i].rotate();
+        }
+    }
+    _selectid = -1;
+    _bRedTurn = true;
+    _bSide = bRedSide;
+    update();
+
 }
 
 //画棋盘
 void Board::paintEvent(QPaintEvent *)
 {
+
     QPainter painter (this);
     int d=40;
     _r=d/2;
+    painter.drawPixmap(0,0,width(),height(),QPixmap("../111.jpg"));
     //画10条横线
+    painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
     for (int i=1;i<=10;i++)
     {
         painter.drawLine(QPoint(d,i*d),QPoint(9*d,i*d));
@@ -87,9 +122,10 @@ void Board::drawStone(QPainter& painter,int id)
    //给棋子上的字涂上颜色，来区分红黑子
    if (_s[id]._red)
      painter.setPen(Qt::red);
-   painter.setFont(QFont("system",_r,700));
 
-   painter.drawText(rect,_s[id].getText(),QTextOption(Qt::AlignCenter));//在棋子上写字
+   painter.setFont(QFont("隶书",_r,700));
+
+   painter.drawText(rect,_s[id].name(),QTextOption(Qt::AlignCenter));//在棋子上写字
 }
 
 bool Board::getRowCol(QPoint pt, int &row, int &col)
@@ -117,7 +153,7 @@ bool Board::canMove1 (int moveid,int row,int col,int killid)
       2.移动的步长是一个格子
     */
     //只能在九宫格内走动
-    if (_s[moveid]._red)
+    if (isBottomSide(moveid))
     {
         if (row<7) return false;
     }
@@ -139,7 +175,7 @@ bool Board::canMove1 (int moveid,int row,int col,int killid)
 }
 //士的移动
 bool Board::canMove2 (int moveid,int row,int col,int )
-{   if (_s[moveid]._red)
+{   if (isBottomSide(moveid))
     {
         if (row<7) return false;
     }
@@ -306,7 +342,11 @@ int Board::getStoneId(int rEye, int cEye)
 
 bool Board::isBottomSide(int id)
 {
-    if (_s[id]._red) return true;
+    //红棋的_red永远为true
+    //黑棋的_red永远为false
+    //红旗在下面 _bSide为false
+    //黑棋在下面 _bSide为true
+    if (_bSide ==_s[id]._red) return true;
     return false;
 }
 
@@ -376,17 +416,30 @@ void Board::reliveStone(int id)
     if (id==-1) return;
     _s[id]._dead = false;
 }
+
 void Board::killStone(int id)
+{
+    if (id == -1) return;
+    _s[id]._dead = true;
+    if (id==4)
+       QMessageBox::about(this,"end","黑方胜利!");
+    if
+       (id==20)
+       QMessageBox::about(this,"end","红方胜利!");
+
+}
+
+void Board::killStone(int id,int )
 {
     if (id == -1) return;
     _s[id]._dead = true;
 }
 
+
 void Board::moveStone(int moveid, int row, int col)
 {
     _s[moveid]._row = row;
     _s[moveid]._col = col;
-
     _bRedTurn = !_bRedTurn;
 }
 
@@ -397,6 +450,22 @@ void Board::moveStone(int moveid, int killid, int row, int col)
     killStone(killid);
 
     moveStone(moveid,row,col);
+
+    flag=0;
+    int ret = getStoneCountAtLine(_s[4]._row,_s[4]._col,_s[20]._row,_s[20]._col);
+    if (ret == 0)
+    {
+        if(_bRedTurn)
+        {
+            QMessageBox::about(this,"end","红方胜利");
+            flag=1;
+        }
+        else
+        {
+            QMessageBox::about(this,"end","黑方胜利");
+            flag=1;
+        }
+    }
 }
 
 bool Board::sameColor(int id1,int id2)
@@ -440,6 +509,9 @@ void Board::trySelectStone(int id)
 
 void Board::click(int id, int row, int col)
 {
+    if (_s[4]._dead==true || _s[20]._dead==true ||flag==1)
+        return;
+
     //如果之前没选到棋子
     //就调用trySelectStone函数
     if (this->_selectid==-1)
@@ -464,4 +536,28 @@ void Board::click(QPoint pt)
     click(id,row,col);
 }
 
-//每释放一次鼠标，都会调用一次这个函数
+void Board::back(Step *step)
+{
+    reliveStone(step->_killid);
+    moveStone(step->_moveid,step->_rowFrom,step->_colFrom);
+}
+void Board::back()
+{
+    backOne();
+}
+void Board::backOne()
+{
+    if (this->_steps.size() == 0) return;
+    Step* step = this->_steps.last();
+    _steps.removeLast();
+    back(step);
+
+    update();
+    delete step;
+
+}
+void Board::slotBack()
+{
+    flag=0;
+     back();
+}

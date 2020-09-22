@@ -2,10 +2,18 @@
 #include "SingleGame.h"
 #include "NetGame.h"
 #include <QMessageBox>
+#include <QPalette>
+#include <QPixmap>
+#include "CtrlPanel.h"
+
+
+
 int main (int argc,char * argv[])
 {
     QApplication app (argc,argv);
-    QMessageBox::StandardButton ret;
+    CtrlPanel board;
+    board.show();
+   /* QMessageBox::StandardButton ret;
     ret = QMessageBox::question(NULL,"server or client","作为服务器启动");
     bool bServer = false;
     if (ret == QMessageBox::Yes)
@@ -13,9 +21,8 @@ int main (int argc,char * argv[])
         bServer = true;
     }
 
-    NetGame board(bServer);
-   // SingleGame board;
+    NetGame board(bServer);*/
+    //SingleGame board;
     //Board board;
-    board.show();
     return app.exec();
 }

@@ -1,6 +1,13 @@
 #include "SingleGame.h"
 #include <QTimer>
+SingleGame::SingleGame(QWidget *parent) : Board(parent)
+{
+    _level=3;
+}
+SingleGame::~SingleGame()
+{
 
+}
 void SingleGame::click(int id, int row, int col)
 {
     if (!this->_bRedTurn)
@@ -72,15 +79,15 @@ int SingleGame::calcScore()
     int redTotalScore = 0;
     int blackTotalScore = 0;
     //enum TYPE{JIANG,CHE,PAO,MA,BING,SHI,XIANG};
-    static int chessScore[] = {100,50,50,20,1500,10,10};
+    static int chessScore[] = {15000, 1000, 501, 499, 200, 100, 100};
 
     //黑棋分的总数-红棋分的总数
-    for  (int i=16;i<32;i++)
+    for  (int i=0;i<16;i++)
     {
          if (_s[i]._dead) continue;
          redTotalScore += chessScore[_s[i]._type];
     }
-    for  (int i=0;i<16;i++)
+    for  (int i=16;i<32;i++)
     {
          if (_s[i]._dead) continue;
          blackTotalScore += chessScore[_s[i]._type];
@@ -95,10 +102,10 @@ int SingleGame::getMaxScore(int level,int curMinScore)
     QVector<Step *> steps;
     getAllPossibleMove(steps); //人走的（即红棋的）所有可能步数
 
-    int maxScore = -100000;
+    int maxScore = -300000;
     while (steps.count())
     {
-        Step * step = steps.back();
+        Step * step = steps.last();
         steps.removeLast();
 
         fakeMove (step);
@@ -110,7 +117,7 @@ int SingleGame::getMaxScore(int level,int curMinScore)
         {
             while (steps.count())
             {
-                Step * step = steps.back();
+                Step * step = steps.last();
                 steps.removeLast();
                 delete  step;
             }
@@ -132,10 +139,10 @@ int SingleGame::getMinScore(int level,int curMaxScore)
     QVector<Step *> steps;
     getAllPossibleMove(steps); //人走的（即红棋的）所有可能步数
 
-    int minScore = 100000;
+    int minScore = 300000;
     while (steps.count())
     {
-        Step * step = steps.back();
+        Step * step = steps.last();
         steps.removeLast();
         fakeMove (step);
         int score = getMaxScore (level-1,minScore);
@@ -145,7 +152,7 @@ int SingleGame::getMinScore(int level,int curMaxScore)
         {
             while (steps.count())
             {
-                Step * step = steps.back();
+                Step * step = steps.last();
                 steps.removeLast();
                 delete  step;
             }
@@ -166,7 +173,7 @@ Step* SingleGame::getBestMove()
     getAllPossibleMove(steps);
 
     //2.试着走一下
-    int maxScore = -100000;
+    int maxScore = -300000;
     Step *ret = NULL;
     while (steps.count())
     {
@@ -174,7 +181,7 @@ Step* SingleGame::getBestMove()
         steps.removeLast();
         fakeMove (step);
         //机器走后，在人走的步数中得到的最小值(在机器可以走的几步中)
-        int score = getMinScore (_level-1,maxScore);
+        int score = getMinScore (this->_level-1,maxScore);
         //之后再恢复
         unfakeMove (step);
 

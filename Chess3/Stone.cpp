@@ -13,6 +13,8 @@ Stone::~Stone()
 
 QString Stone::name()
 {
+    if (_id<16)
+    {
     switch (this->_type)
     {
     case CHE:
@@ -24,13 +26,35 @@ QString Stone::name()
     case BING:
         return "兵";
     case JIANG:
-        return "将";
+        return "帅";
     case SHI:
         return "士";
     case XIANG:
         return "相";
     }
     return "错误";
+    }
+    if (_id>=16)
+    {
+        switch (this->_type)
+        {
+        case CHE:
+            return "车";
+        case MA:
+            return "马";
+        case PAO:
+            return "炮";
+        case BING:
+            return "卒";
+        case JIANG:
+            return "将";
+        case SHI:
+            return "士";
+        case XIANG:
+            return "象";
+        }
+        return "错误";
+    }
 }
 
 void Stone::init(int id)

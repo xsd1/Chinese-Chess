@@ -24,7 +24,8 @@ public:
     int _selectid;//记录被选中的棋子id
     bool _bRedTurn; //该轮到谁走了
     QPushButton _button;
-
+    void dealSlot();
+    int flag=0;
 
     //返回象棋棋盘行列对应的像素坐标
     QPoint center (int row,int col);

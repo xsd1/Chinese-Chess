@@ -7,10 +7,8 @@ class SingleGame : public Board
 {
     Q_OBJECT
 public:
-    SingleGame ()
-    {
-        _level = 3;
-    }
+    explicit SingleGame(QWidget *parent = 0);
+    ~SingleGame();
     virtual void click (int id,int row,int col);
 
     Step * getBestMove ();

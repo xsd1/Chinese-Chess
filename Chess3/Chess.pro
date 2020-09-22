@@ -16,3 +16,7 @@ SOURCES += \
     NetGame.cpp
 
 QT += widgets gui network
+
+RESOURCES +=
+
+CONFIG += C++ 11
